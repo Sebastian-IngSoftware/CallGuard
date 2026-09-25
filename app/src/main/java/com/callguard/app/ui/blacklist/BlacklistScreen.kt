@@ -1,6 +1,7 @@
 package com.callguard.app.ui.blacklist
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -132,21 +133,36 @@ fun BlacklistScreen(
 }
 
 @Composable
-private fun MatchTypeChip(label: String, selected: Boolean, onClick: () -> Unit) {
+private fun MatchTypeChip(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
     if (selected) {
-        NeumorphicButton(onClick = onClick, contentColor = NeuSuccess) {
+        NeumorphicButton(
+            onClick = onClick,
+            contentColor = NeuSuccess
+        ) {
             Text(
                 label,
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                modifier = Modifier.padding(
+                    horizontal = 14.dp,
+                    vertical = 8.dp
+                ),
                 style = MaterialTheme.typography.labelMedium
             )
         }
     } else {
-        NeumorphicInset {
+        NeumorphicInset(
+            modifier = Modifier.clickable(onClick = onClick)
+        ) {
             Text(
                 label,
                 color = NeuTextMuted,
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                modifier = Modifier.padding(
+                    horizontal = 14.dp,
+                    vertical = 8.dp
+                ),
                 style = MaterialTheme.typography.labelMedium
             )
         }

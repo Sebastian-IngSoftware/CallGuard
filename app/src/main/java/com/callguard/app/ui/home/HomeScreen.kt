@@ -26,6 +26,13 @@ import com.callguard.app.ui.theme.NeuText
 import com.callguard.app.ui.theme.NeuTextMuted
 import com.callguard.app.ui.theme.NeumorphicButton
 import com.callguard.app.ui.theme.NeumorphicCard
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.ui.platform.LocalContext
+import com.callguard.app.R
+import androidx.compose.ui.res.painterResource
 
 @Composable
 fun HomeScreen(
@@ -67,11 +74,13 @@ fun HomeScreen(
             label = "Configuración",
             onClick = onNavigateToSettings
         )
-        HomeMenuButton(
-            icon = Icons.Filled.NewReleases,
-            label = "Novedades",
-            onClick = onNavigateToNews
-        )
+
+        GithubRepositoryButton()
+//        HomeMenuButton(
+//            icon = Icons.Filled.NewReleases,
+//            label = "Novedades",
+//            onClick = onNavigateToNews
+//        )
     }
 }
 
@@ -108,6 +117,52 @@ private fun HomeMenuButton(
         ) {
             Icon(imageVector = icon, contentDescription = null, tint = NeuAccent)
             Text(label, color = NeuText, style = MaterialTheme.typography.titleMedium)
+        }
+    }
+}
+
+@Composable
+private fun GithubRepositoryButton() {
+    val context = LocalContext.current
+
+    NeumorphicButton(
+        onClick = {
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://github.com/Sebastian-IngSoftware/CallGuard")
+            )
+            context.startActivity(intent)
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+    ) {
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_github),
+                contentDescription = "GitHub",
+                tint = NeuAccent
+            )
+
+            Column {
+                Text(
+                    "Repositorio en GitHub",
+                    color = NeuText,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text(
+                    "Ver código fuente",
+                    color = NeuTextMuted,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
