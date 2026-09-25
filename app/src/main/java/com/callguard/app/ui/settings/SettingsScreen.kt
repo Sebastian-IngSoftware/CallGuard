@@ -15,28 +15,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Contacts
-import androidx.compose.material.icons.filled.PhoneDisabled
-import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.callguard.app.ui.theme.NeuAccent
-import com.callguard.app.ui.theme.NeuBackground
-import com.callguard.app.ui.theme.NeuSurface
 import com.callguard.app.ui.theme.NeuText
+import com.callguard.app.ui.theme.NeuBackground
 import com.callguard.app.ui.theme.NeuTextMuted
-import com.callguard.app.ui.theme.NeumorphicButton
-import com.callguard.app.ui.theme.NeumorphicCard
+import com.callguard.app.ui.theme.TerminalButton
+import com.callguard.app.ui.theme.TerminalCheckRow
+import com.callguard.app.ui.theme.TerminalDivider
+import com.callguard.app.ui.theme.TerminalHeader
+import com.callguard.app.ui.theme.TerminalPanel
+import com.callguard.app.ui.theme.terminalScanlines
 
 @Composable
 fun SettingsScreen(
@@ -58,99 +56,81 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(NeuBackground)
-            .padding(20.dp)
+            .terminalScanlines()
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Configuración", color = NeuText, style = MaterialTheme.typography.headlineSmall)
-        Spacer(Modifier.height(20.dp))
+        TerminalHeader(
+            title = "CONFIGURACION",
+            subtitle = "- acceso y comportamiento del filtro"
+        )
 
-        NeumorphicCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(4.dp)) {
-                SettingRow(
-                    title = "Protección activa",
+        TerminalPanel(modifier = Modifier.fillMaxWidth(), contentPadding = 6.dp) {
+            Column {
+                TerminalCheckRow(
+                    label = "PROTECCION_ACTIVA",
                     checked = protectionEnabled,
-                    onCheckedChange = viewModel::setProtectionEnabled
+                    onClick = { viewModel.setProtectionEnabled(!protectionEnabled) }
                 )
-                SettingDivider()
-                SettingRow(
-                    title = "Bloquear todos los desconocidos",
+                TerminalDivider()
+                TerminalCheckRow(
+                    label = "BLOQUEAR_DESCONOCIDOS",
                     checked = blockAllUnknown,
-                    onCheckedChange = viewModel::setBlockAllUnknown
+                    onClick = { viewModel.setBlockAllUnknown(!blockAllUnknown) }
                 )
             }
         }
-
-        Spacer(Modifier.height(24.dp))
 
         Text(
-            "Para que CallGuard pueda filtrar llamadas, Android exige dos cosas: " +
-                "que le des acceso a tus contactos y que lo asignes como tu app de " +
-                "bloqueo de llamadas.",
+            "- android_exige_conceder_acceso_a_contactos_y_asignar_la_app_como_filtro_de_llamadas",
             color = NeuTextMuted,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodySmall
         )
 
-        Spacer(Modifier.height(16.dp))
+        TerminalActionButton(
+            index = 1,
+            label = "SOLICITAR_ACCESO_CONTACTOS",
+            onClick = { contactsPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS) }
+        )
 
-        NeumorphicButton(
-            onClick = { contactsPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS) },
-            modifier = Modifier.fillMaxWidth().height(56.dp)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(imageVector = Icons.Filled.Contacts, contentDescription = null)
-                Text("Conceder acceso a contactos", style = MaterialTheme.typography.titleSmall)
-            }
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-        NeumorphicButton(
-            onClick = { requestCallScreeningRole(context, roleRequestLauncher) },
-            modifier = Modifier.fillMaxWidth().height(56.dp)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(imageVector = Icons.Filled.PhoneDisabled, contentDescription = null)
-                Text("Establecer como app de bloqueo", style = MaterialTheme.typography.titleSmall)
-            }
-        }
+        TerminalActionButton(
+            index = 2,
+            label = "SER_APP_DE_BLOQUEO",
+            onClick = { requestCallScreeningRole(context, roleRequestLauncher) }
+        )
     }
 }
 
 @Composable
-private fun SettingRow(
-    title: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+private fun TerminalActionButton(
+    index: Int,
+    label: String,
+    onClick: () -> Unit
 ) {
-    Row(
+    TerminalButton(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .height(52.dp)
     ) {
-        Text(title, color = NeuText, modifier = Modifier.padding(end = 8.dp))
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = NeuAccent,
-                checkedTrackColor = NeuSurface,
-                uncheckedThumbColor = NeuTextMuted,
-                uncheckedTrackColor = NeuSurface
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "[$index]",
+                color = LocalContentColor.current.copy(alpha = 0.6f),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold
             )
-        )
+            Text(
+                text = label,
+                color = LocalContentColor.current,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
-}
-
-@Composable
-private fun SettingDivider() {
-    androidx.compose.material3.HorizontalDivider(color = NeuSurface, thickness = 1.dp)
 }
 
 private fun requestCallScreeningRole(

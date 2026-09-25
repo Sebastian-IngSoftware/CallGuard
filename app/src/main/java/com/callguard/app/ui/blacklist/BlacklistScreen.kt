@@ -1,6 +1,7 @@
 package com.callguard.app.ui.blacklist
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,16 +14,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,21 +31,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.callguard.app.domain.model.BlacklistRule
 import com.callguard.app.domain.model.MatchType
 import com.callguard.app.ui.theme.NeuAccent
 import com.callguard.app.ui.theme.NeuBackground
+import com.callguard.app.ui.theme.NeuBorder
 import com.callguard.app.ui.theme.NeuSuccess
-import com.callguard.app.ui.theme.NeuSurface
+import com.callguard.app.ui.theme.NeuTertiary
 import com.callguard.app.ui.theme.NeuText
 import com.callguard.app.ui.theme.NeuTextMuted
-import com.callguard.app.ui.theme.NeumorphicButton
-import com.callguard.app.ui.theme.NeumorphicCard
-import com.callguard.app.ui.theme.NeumorphicInset
+import com.callguard.app.ui.theme.TerminalButton
+import com.callguard.app.ui.theme.TerminalHeader
+import com.callguard.app.ui.theme.TerminalPanel
+import com.callguard.app.ui.theme.TerminalRadioChip
+import com.callguard.app.ui.theme.TerminalStatus
+import com.callguard.app.ui.theme.terminalScanlines
 
 @Composable
 fun BlacklistScreen(
@@ -59,70 +68,129 @@ fun BlacklistScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(NeuBackground)
-            .padding(20.dp)
+            .terminalScanlines()
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Lista negra", color = NeuText, style = MaterialTheme.typography.headlineSmall)
-        Spacer(Modifier.height(16.dp))
+        TerminalHeader(
+            title = "LISTA_NEGRA",
+            subtitle = "- patrones de numeros a bloquear"
+        )
 
-        NeumorphicCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
+        TerminalPanel(modifier = Modifier.fillMaxWidth(), contentPadding = 14.dp) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    "Número o patrón",
+                    "- PATRON",
                     color = NeuTextMuted,
                     style = MaterialTheme.typography.labelMedium
                 )
-                Spacer(Modifier.height(6.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    NeumorphicInset(modifier = Modifier.weight(1f)) {
-                        BasicTextField(
-                            value = pattern,
-                            onValueChange = { pattern = it },
-                            singleLine = true,
-                            textStyle = TextStyle(color = NeuText, fontSize = MaterialTheme.typography.bodyLarge.fontSize),
-                            cursorBrush = androidx.compose.ui.graphics.SolidColor(NeuAccent),
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(NeuBackground)
+                        .border(1.dp, NeuBorder)
+                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                ) {
+                    if (pattern.isEmpty()) {
+                        Text(
+                            "INGRESE_PATRON_O_NUMERO...",
+                            color = NeuTextMuted.copy(alpha = 0.4f),
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
-                    Spacer(Modifier.width(10.dp))
-                    NeumorphicButton(
-                        onClick = {
-                            viewModel.addRule(pattern, selectedType)
-                            pattern = ""
-                        },
-                        modifier = Modifier.height(48.dp)
-                    ) {
-                        Icon(imageVector = Icons.Filled.Add, contentDescription = "Agregar regla")
+                    BasicTextField(
+                        value = pattern,
+                        onValueChange = { pattern = it },
+                        singleLine = true,
+                        textStyle = TextStyle(
+                            color = NeuText,
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 15.sp,
+                            letterSpacing = 1.sp
+                        ),
+                        cursorBrush = SolidColor(NeuAccent),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Text(
+                    "- TIPO_DE_MATCH",
+                    color = NeuTextMuted,
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MatchType.entries.take(2).forEach { type ->
+                            TerminalRadioChip(
+                                label = type.toTerminalLabel(),
+                                selected = selectedType == type,
+                                onClick = { selectedType = type },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MatchType.entries.drop(2).forEach { type ->
+                            TerminalRadioChip(
+                                label = type.toTerminalLabel(),
+                                selected = selectedType == type,
+                                onClick = { selectedType = type },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
                 }
-
-                Spacer(Modifier.height(12.dp))
-
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    MatchType.entries.forEach { type ->
-                        MatchTypeChip(
-                            label = type.toLabel(),
-                            selected = selectedType == type,
-                            onClick = { selectedType = type }
-                        )
-                    }
+                TerminalButton(
+                    onClick = {
+                        viewModel.addRule(pattern, selectedType)
+                        pattern = ""
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp)
+                ) {
+                    Text(
+                        "[ + ] AGREGAR_REGLA",
+                        color = LocalContentColor.current,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
 
-        Spacer(Modifier.height(20.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "- ",
+                color = NeuAccent,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                "${rules.size} REGLA(S)",
+                color = NeuText,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.width(10.dp))
+            TerminalStatus(
+                text = "${rules.count { it.isEnabled }} EN_LINEA",
+                color = if (rules.any { it.isEnabled }) NeuSuccess else NeuTextMuted
+            )
+        }
 
         if (rules.isEmpty()) {
             Text(
-                "Todavía no agregaste reglas a tu lista negra.",
+                "- SIN_REGLAS. AGREGUE_UN_PATRON_DE_BLOQUEO.",
                 color = NeuTextMuted,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(rules, key = { it.id }) { rule ->
-                BlacklistRuleRow(
+            itemsIndexed(rules, key = { _, rule -> rule.id }) { index, rule ->
+                TerminalRuleRow(
+                    index = index,
                     rule = rule,
                     onToggle = { viewModel.toggleRule(rule) },
                     onDelete = { viewModel.deleteRule(rule) }
@@ -132,89 +200,75 @@ fun BlacklistScreen(
     }
 }
 
-@Composable
-private fun MatchTypeChip(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    if (selected) {
-        NeumorphicButton(
-            onClick = onClick,
-            contentColor = NeuSuccess
-        ) {
-            Text(
-                label,
-                modifier = Modifier.padding(
-                    horizontal = 14.dp,
-                    vertical = 8.dp
-                ),
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
-    } else {
-        NeumorphicInset(
-            modifier = Modifier.clickable(onClick = onClick)
-        ) {
-            Text(
-                label,
-                color = NeuTextMuted,
-                modifier = Modifier.padding(
-                    horizontal = 14.dp,
-                    vertical = 8.dp
-                ),
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
-    }
-}
-
-private fun MatchType.toLabel(): String = when (this) {
-    MatchType.CONTAINS -> "Contiene"
-    MatchType.STARTS_WITH -> "Empieza con"
-    MatchType.ENDS_WITH -> "Termina con"
-    MatchType.EXACT -> "Exacto"
+private fun MatchType.toTerminalLabel(): String = when (this) {
+    MatchType.CONTAINS -> "CONTIENE"
+    MatchType.STARTS_WITH -> "EMPIEZA_CON"
+    MatchType.ENDS_WITH -> "TERMINA_CON"
+    MatchType.EXACT -> "EXACTO"
 }
 
 @Composable
-private fun BlacklistRuleRow(
+private fun TerminalRuleRow(
+    index: Int,
     rule: BlacklistRule,
     onToggle: () -> Unit,
     onDelete: () -> Unit
 ) {
-    NeumorphicCard(modifier = Modifier.fillMaxWidth(), cornerRadius = 16.dp, elevation = 8.dp) {
-        Row(
-            modifier = Modifier
-                .padding(14.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(rule.pattern, color = NeuText, style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    rule.matchType.toLabel(),
-                    color = NeuAccent,
-                    style = MaterialTheme.typography.bodySmall
-                )
+    val number = (index + 1).toString().padStart(2, '0')
+    val borderColor = if (rule.isEnabled) NeuBorder else NeuTertiary.copy(alpha = 0.35f)
+
+    TerminalPanel(
+        modifier = Modifier.fillMaxWidth(),
+        borderColor = borderColor,
+        contentPadding = 12.dp
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        "[$number]",
+                        color = NeuAccent.copy(alpha = 0.7f),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        rule.pattern,
+                        color = if (rule.isEnabled) NeuText else NeuTextMuted.copy(alpha = 0.6f),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (rule.isEnabled) "[ON]" else "[OFF]",
+                        color = if (rule.isEnabled) NeuSuccess else NeuTextMuted,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable(onClick = onToggle)
+                    )
+                    IconButton(onClick = onDelete) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Eliminar regla",
+                            tint = NeuTextMuted
+                        )
+                    }
+                }
             }
-            Switch(
-                checked = rule.isEnabled,
-                onCheckedChange = { onToggle() },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = NeuAccent,
-                    checkedTrackColor = NeuSurface,
-                    uncheckedThumbColor = NeuTextMuted,
-                    uncheckedTrackColor = NeuSurface
-                )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = rule.matchType.toTerminalLabel(),
+                color = NeuAccent,
+                style = MaterialTheme.typography.labelSmall
             )
-            IconButton(onClick = onDelete) {
-                Icon(
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = "Eliminar regla",
-                    tint = NeuTextMuted
-                )
-            }
         }
     }
 }

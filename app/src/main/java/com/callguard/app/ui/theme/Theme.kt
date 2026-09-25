@@ -29,6 +29,7 @@ fun CallGuardTheme(
 ) {
     MaterialTheme(
         colorScheme = CallGuardColors,
+        typography = TerminalTypography,
         content = content
     )
 }
