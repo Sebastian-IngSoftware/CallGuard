@@ -1,18 +1,31 @@
 package com.callguard.app.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.NewReleases
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.callguard.app.ui.theme.NeuAccent
+import com.callguard.app.ui.theme.NeuBackground
+import com.callguard.app.ui.theme.NeuSuccess
+import com.callguard.app.ui.theme.NeuText
+import com.callguard.app.ui.theme.NeuTextMuted
+import com.callguard.app.ui.theme.NeumorphicButton
+import com.callguard.app.ui.theme.NeumorphicCard
 
 @Composable
 fun HomeScreen(
@@ -20,27 +33,81 @@ fun HomeScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToNews: () -> Unit
 ) {
-    Scaffold(topBar = { TopAppBar(title = { Text("CallGuard") }) }) { padding ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(NeuBackground)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        HomeHeader()
+
+        NeumorphicCard(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text(
+                    "Protección activa",
+                    color = NeuText,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    "CallGuard está filtrando tus llamadas según tus reglas.",
+                    color = NeuTextMuted,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        HomeMenuButton(
+            icon = Icons.Filled.Block,
+            label = "Lista negra",
+            onClick = onNavigateToBlacklist
+        )
+        HomeMenuButton(
+            icon = Icons.Filled.Settings,
+            label = "Configuración",
+            onClick = onNavigateToSettings
+        )
+        HomeMenuButton(
+            icon = Icons.Filled.NewReleases,
+            label = "Novedades",
+            onClick = onNavigateToNews
+        )
+    }
+}
+
+@Composable
+private fun HomeHeader() {
+    androidx.compose.foundation.layout.Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Column {
+            Text("Call Guard", color = NeuText, style = MaterialTheme.typography.headlineSmall)
+        }
+    }
+}
+
+@Composable
+private fun HomeMenuButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    onClick: () -> Unit
+) {
+    NeumorphicButton(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+    ) {
+        androidx.compose.foundation.layout.Row(
             modifier = Modifier
-                .padding(padding)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                "Protegé tu teléfono de llamadas no deseadas.",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Button(onClick = onNavigateToBlacklist, modifier = Modifier.fillMaxWidth()) {
-                Text("Lista negra")
-            }
-            Button(onClick = onNavigateToSettings, modifier = Modifier.fillMaxWidth()) {
-                Text("Configuración")
-            }
-            Button(onClick = onNavigateToNews, modifier = Modifier.fillMaxWidth()) {
-                Text("Novedades")
-            }
+            Icon(imageVector = icon, contentDescription = null, tint = NeuAccent)
+            Text(label, color = NeuText, style = MaterialTheme.typography.titleMedium)
         }
     }
 }

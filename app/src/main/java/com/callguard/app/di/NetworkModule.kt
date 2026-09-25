@@ -16,8 +16,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
-    // TODO: reemplazar por la URL real de tu API cuando la tengas.
     private const val BASE_URL = "https://api.callguard.example.com/"
 
     @Provides
