@@ -1,0 +1,43 @@
+name: Build y publicar APK
+
+on:
+  push:
+    tags:
+      - "v*.*.*"   # se dispara cuando subís un tag tipo v1.0.0
+  workflow_dispatch:  # también podés dispararlo a mano desde la pestaña Actions
+
+permissions:
+  contents: write  # necesario para poder crear el Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Dar permisos de ejecución a gradlew
+        run: chmod +x gradlew
+
+      - name: Compilar APK (debug)
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Subir el APK como artefacto del build
+        uses: actions/upload-artifact@v4
+        with:
+          name: CallGuard-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publicar en Releases (solo si el push fue un tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/build/outputs/apk/debug/app-debug.apk
+          generate_release_notes: true
