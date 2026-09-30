@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- SplashScreen de Android 12+: fondo propio e icono centrado.
+         Hay que repetir los items del tema base: los recursos por
+         calificador reemplazan la definición, no la extienden. -->
+    <style name="Theme.CallGuard" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/callguard_splash_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowSplashScreenBackground">@color/callguard_splash_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+    </style>
+</resources>

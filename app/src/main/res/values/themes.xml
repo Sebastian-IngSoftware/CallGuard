@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.CallGuard" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- windowBackground es la pantalla de arranque en Android 11 y menor
+         (en 12+ manda windowSplashScreenBackground, ver values-v31).
+         Iconos claros porque la app es siempre oscura. -->
+    <style name="Theme.CallGuard" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/callguard_splash_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
 </resources>
