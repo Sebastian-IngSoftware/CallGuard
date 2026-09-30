@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
-    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".CallGuardApp"
@@ -39,22 +37,9 @@
             android:permission="android.permission.BIND_SCREENING_SERVICE"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.telecom.CallScreeningService" />
+                <action android:name="android.telecom.TelecomScreeningService" />
             </intent-filter>
         </service>
-
-        <!-- Le dice a WorkManager que use nuestra HiltWorkerFactory en vez de la default -->
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            android:exported="false"
-            tools:node="merge">
-            <meta-data
-                android:name="androidx.work.WorkManagerInitializer"
-                android:value="androidx.startup"
-                tools:node="remove" />
-        </provider>
-
     </application>
 
 </manifest>
