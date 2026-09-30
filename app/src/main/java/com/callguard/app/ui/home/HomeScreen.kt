@@ -43,7 +43,8 @@ import com.callguard.app.ui.theme.terminalScanlines
 @Composable
 fun HomeScreen(
     onNavigateToBlacklist: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToNews: () -> Unit
 ) {
     val context = LocalContext.current
     Column(
@@ -113,6 +114,12 @@ fun HomeScreen(
                 )
             }
         )
+//        TerminalMenuButton(
+//            index = 4,
+//            label = "NOVEDADES",
+//            onClick = onNavigateToNews,
+//            icon = { Icon(imageVector = Icons.Filled.NewReleases, contentDescription = null) }
+//        )
     }
 }
 
